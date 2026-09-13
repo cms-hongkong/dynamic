@@ -9,6 +9,7 @@
             --elephant-color: #8D6E63;
             --bird-color: #AED581;
             --bg-color: #FFFDE7;
+            --primary-color: #FFB300;
         }
 
         body {
@@ -20,234 +21,183 @@
             align-items: center;
             color: #333;
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
+        /* 畫面切換控制 */
+        .screen { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 800px; padding: 20px; box-sizing: border-box; }
+        .screen.active { display: flex; animation: fadeIn 0.5s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         /* 標題區 */
-        .header {
-            text-align: center;
-            margin: 20px;
-        }
+        .header { text-align: center; margin-bottom: 20px; }
         h1 { font-size: 2.5rem; color: #4E342E; margin-bottom: 5px; }
         p.subtitle { font-size: 1.2rem; color: #795548; }
 
-        /* 視覺教具區 */
-        .teaching-cards {
-            display: flex;
-            gap: 20px;
-            width: 90%;
-            max-width: 800px;
-            justify-content: center;
-            margin-bottom: 30px;
+        /* 元件樣式 */
+        input[type="text"] {
+            padding: 15px; font-size: 1.5rem; border: 3px solid var(--primary-color);
+            border-radius: 15px; text-align: center; width: 80%; max-width: 300px; margin-bottom: 20px;
         }
 
+        .level-btn {
+            padding: 15px 30px; font-size: 1.2rem; margin: 10px; border: none;
+            border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.2s;
+            background-color: white; border: 3px solid var(--primary-color); color: #333;
+        }
+        .level-btn:hover { background-color: var(--primary-color); color: white; }
+
+        /* 視覺教具區 (遊戲中) */
+        .teaching-cards { display: flex; gap: 20px; width: 100%; justify-content: center; margin-bottom: 30px; }
         .card {
-            flex: 1;
-            border-radius: 30px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: 8px solid transparent;
-            opacity: 0.6;
-            cursor: pointer;
+            flex: 1; border-radius: 30px; padding: 20px; text-align: center;
+            transition: all 0.3s ease; border: 8px solid transparent; opacity: 0.3;
+            transform: scale(0.9);
         }
-
-        .card.active {
-            opacity: 1;
-            transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
+        .card.active { opacity: 1; transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 
         .elephant-card { background-color: var(--elephant-color); color: white; border-color: #5D4037; }
         .elephant-card.active { border-color: #FFAB00; animation: shake 0.5s infinite alternate; }
-
         .bird-card { background-color: var(--bird-color); color: #33691E; border-color: #7CB342; }
         .bird-card.active { border-color: #FF4081; transform: translateY(-10px) scale(1.05) !important; }
 
         .emoji-large { font-size: 5rem; display: block; margin: 10px 0; }
-        .symbol { font-size: 3rem; font-weight: bold; font-family: "Times New Roman", serif; italic; }
+        .symbol { font-size: 3rem; font-weight: bold; font-family: "Times New Roman", serif; font-style: italic; }
 
-        /* 遊戲指令區 */
-        .control-panel {
-            background: white;
-            padding: 25px;
-            border-radius: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 600px;
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        .progress { font-size: 1.5rem; font-weight: bold; color: #E91E63; margin-bottom: 20px; }
 
-        .instruction-text {
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 20px 0;
-            min-height: 2.5rem;
-            color: #d32f2f;
-        }
+        /* 評估與排行榜 */
+        .eval-btn { font-size: 1.5rem; padding: 20px; margin: 10px; border-radius: 20px; border: none; cursor: pointer; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .eval-btn:hover { transform: scale(1.05); background: #E3F2FD; }
 
-        .btn-group {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+        .leaderboard-table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .leaderboard-table th, .leaderboard-table td { padding: 15px; text-align: center; border-bottom: 1px solid #EEE; }
+        .leaderboard-table th { background-color: var(--primary-color); color: white; }
 
-        button {
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
+        .feedback-box { background: #E1F5FE; padding: 20px; border-radius: 15px; border-left: 5px solid #0288D1; font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px; width: 100%; }
 
-        .btn-elephant { background-color: var(--elephant-color); color: white; }
-        .btn-bird { background-color: var(--bird-color); color: #33691E; }
-        .btn-auto { background-color: #FFD54F; color: #7F0000; }
-        .btn-reset { background-color: #CFD8DC; color: #455A64; }
-        button:active { transform: scale(0.9); }
-
-        /* 樂曲與獎勵 */
-        .music-area {
-            background: rgba(255,255,255,0.7);
-            padding: 20px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 600px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .reward-display {
-            font-size: 1.5rem;
-            color: #E91E63;
-            margin-top: 10px;
-            min-height: 2rem;
-        }
-
-        .badge-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-            font-size: 2rem;
-        }
-
-        /* 老師說明區 */
-        .teacher-note {
-            background: #E1F5FE;
-            padding: 20px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 600px;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 50px;
-            border-left: 5px solid #0288D1;
-        }
-
-        @keyframes shake {
-            0% { transform: rotate(-1deg); }
-            100% { transform: rotate(1deg); }
-        }
-
-        /* 動畫反饋 */
-        .celebration {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 40px;
-            border-radius: 100px;
-            border: 10px solid #FFD54F;
-            z-index: 100;
-            display: none;
-            text-align: center;
-            font-size: 2rem;
-            box-shadow: 0 0 50px rgba(0,0,0,0.3);
-        }
+        @keyframes shake { 0% { transform: rotate(-1deg); } 100% { transform: rotate(1deg); } }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>🐘 力度大冒險：大象 vs 小鳥 🐦</h1>
+        <h1>🐘 力度大冒險 🐦</h1>
         <p class="subtitle">大力 f 還是輕輕 p？來學力度控制！</p>
     </div>
 
-    <div class="teaching-cards">
-        <div id="card-f" class="card elephant-card" onclick="setMode('f')">
-            <span class="emoji-large">🐘</span>
-            <h2>大象來了</h2>
-            <div class="symbol">f</div>
-            <p>強 (Forte)<br>📢 腳步重重踏</p>
-        </div>
-        <div id="card-p" class="card bird-card active" onclick="setMode('p')">
-            <span class="emoji-large">🐦</span>
-            <h2>小鳥來了</h2>
-            <div class="symbol">p</div>
-            <p>弱 (Piano)<br>👂 輕輕拍翅膀</p>
-        </div>
-    </div>
-
-    <div class="control-panel">
-        <div id="instruction" class="instruction-text">🐦 小鳥模式（輕輕彈）</div>
+    <!-- 畫面 1：登入與分層 -->
+    <div id="screen-login" class="screen active">
+        <h2>請輸入冒險者的名字：</h2>
+        <input type="text" id="playerName" placeholder="例如：小明" autocomplete="off">
         
-        <div class="btn-group">
-            <button class="btn-elephant" onclick="setMode('f')">🐘 大象來了</button>
-            <button class="btn-bird" onclick="setMode('p')">🐦 小鳥來了</button>
-            <button id="autoBtn" class="btn-auto" onclick="toggleAuto()">🎲 開始冒險 (自動切換)</button>
-            <button class="btn-reset" onclick="resetGame()">🔄 重新開始</button>
+        <h2>選擇挑戰難度：</h2>
+        <div>
+            <button class="level-btn" onclick="startGame(1)">🌱 等級 1 (慢速: 4秒)</button>
+            <button class="level-btn" onclick="startGame(2)">🏃 等級 2 (中速: 2.5秒)</button>
+            <button class="level-btn" onclick="startGame(3)">🔥 等級 3 (飛速: 1.5秒)</button>
         </div>
-
-        <div class="reward-display" id="reward-text"></div>
-        <div class="badge-container" id="badge-container"></div>
+        <div class="feedback-box" style="margin-top: 30px; font-size: 1rem;">
+            <strong>📘 老師/家長提示：</strong><br>
+            這次更新了<strong>「音量修正」</strong>。大象和小鳥發出的「音高」完全相同，純粹以「大聲」與「細聲」來區分，幫助孩子正確建立「力度」而非「音高」的聽覺認知。
+        </div>
     </div>
 
-    <div class="music-area">
-        <h3>🎵 挑戰曲目：《瑪莉有隻小綿羊》</h3>
-        <p style="font-size: 1.5rem; letter-spacing: 5px;">
-            3 2 1 2 | 3 3 3 - | 2 2 2 - | 3 5 5 -
-        </p>
-        <p>(先試著只彈一個音，跟著動物切換力氣喔！)</p>
+    <!-- 畫面 2：遊戲進行中 -->
+    <div id="screen-game" class="screen">
+        <div id="progress" class="progress">回合: 1 / 10</div>
+        
+        <div class="teaching-cards">
+            <div id="card-f" class="card elephant-card">
+                <span class="emoji-large">🐘</span>
+                <h2>大象來了</h2>
+                <div class="symbol">f</div>
+                <p>強 (Forte)<br>📢 腳步重重踏</p>
+            </div>
+            <div id="card-p" class="card bird-card">
+                <span class="emoji-large">🐦</span>
+                <h2>小鳥來了</h2>
+                <div class="symbol">p</div>
+                <p>弱 (Piano)<br>👂 輕輕拍翅膀</p>
+            </div>
+        </div>
+        
+        <button class="level-btn" style="background:#ef5350; color:white; border-color:#b71c1c;" onclick="stopGame()">🛑 提早結束</button>
     </div>
 
-    <div id="celebration" class="celebration">
-        🎉 你好棒！<br>學會控制力氣了！
+    <!-- 畫面 3：自評畫面 -->
+    <div id="screen-eval" class="screen">
+        <h2>🎉 冒險完成！</h2>
+        <p style="font-size: 1.5rem;">你覺得這次任務表現如何呢？請自己評分：</p>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+            <button class="eval-btn" onclick="submitEval('😎 輕鬆掌握')">😎 輕鬆掌握<br><span style="font-size:1rem">(我很會控制力氣)</span></button>
+            <button class="eval-btn" onclick="submitEval('🤔 有點挑戰')">🤔 有點挑戰<br><span style="font-size:1rem">(有時候會搞錯)</span></button>
+            <button class="eval-btn" onclick="submitEval('😵 太快了')">😵 太快了<br><span style="font-size:1rem">(手忙腳亂啦)</span></button>
+        </div>
     </div>
 
-    <div class="teacher-note">
-        <strong>📘 給老師／家長的提示：</strong><br>
-        <ul>
-            <li>🐘 <strong>大象 (f)：</strong> 引導孩子用「整隻手臂」的力量，想像腳步重重踩在地板感。</li>
-            <li>🐦 <strong>小鳥 (p)：</strong> 想像指尖像小鳥嘴巴輕點水面，練習「精細肌肉」控制。</li>
-            <li><strong>ADHD 教學撇步：</strong> 剛開始不強求節奏準確，只要指令下達時，孩子能立即做出力度反應即可（反應訓練）。</li>
-        </ul>
+    <!-- 畫面 4：排行榜與評語 -->
+    <div id="screen-leaderboard" class="screen">
+        <div id="system-feedback" class="feedback-box"></div>
+        
+        <h2>🏆 冒險者排行榜 (Top 5)</h2>
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>名字</th>
+                    <th>難度</th>
+                    <th>自評結果</th>
+                    <th>時間</th>
+                </tr>
+            </thead>
+            <tbody id="lb-body">
+                <!-- 排行榜內容由 JS 動態生成 -->
+            </tbody>
+        </table>
+        
+        <button class="level-btn" onclick="resetToLogin()">🔄 再玩一次</button>
     </div>
 
     <script>
-        let currentMode = 'p';
-        let switchCount = 0;
-        let autoInterval = null;
-        let elephantBadges = 0;
-        let birdBadges = 0;
-
+        // 系統變數
+        let playerName = "";
+        let currentLevel = 1;
+        let speed = 4000;
+        let round = 1;
+        const totalRounds = 10;
+        let gameInterval = null;
+        let audioCtx = null;
         const synth = window.speechSynthesis;
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        function playDing(freq) {
+        // 初始化 AudioContext (必須在使用者點擊後)
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // --- 核心修正：統一音高，只改音量 ---
+        function playDing(isForte) {
+            initAudio();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            
+            osc.frequency.value = 440; // 統一音高 (A4)
+            
+            // f (大象) 音量 100%，p (小鳥) 音量 5%
+            const targetVolume = isForte ? 1.0 : 0.05; 
+            
+            gain.gain.setValueAtTime(targetVolume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+            
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.5);
+            osc.stop(audioCtx.currentTime + 0.8);
         }
 
         function speak(text) {
@@ -258,76 +208,132 @@
             synth.speak(utter);
         }
 
-        function setMode(mode) {
-            currentMode = mode;
-            switchCount++;
+        // 切換畫面
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // 開始遊戲
+        function startGame(level) {
+            const nameInput = document.getElementById('playerName').value.trim();
+            if (!nameInput) {
+                alert("請先輸入冒險者的名字喔！");
+                return;
+            }
             
-            // 更新 UI
+            playerName = nameInput;
+            currentLevel = level;
+            round = 1;
+            
+            if (level === 1) speed = 4000;
+            if (level === 2) speed = 2500;
+            if (level === 3) speed = 1500;
+
+            showScreen('screen-game');
+            initAudio();
+            nextRound();
+            
+            gameInterval = setInterval(nextRound, speed);
+        }
+
+        // 進行下一回合
+        function nextRound() {
+            if (round > totalRounds) {
+                stopGame(true);
+                return;
+            }
+
+            document.getElementById('progress').innerText = `回合: ${round} / ${totalRounds}`;
+            
+            // 隨機出題
+            const isForte = Math.random() > 0.5;
+            
             document.getElementById('card-f').classList.remove('active');
             document.getElementById('card-p').classList.remove('active');
             
-            const instr = document.getElementById('instruction');
-            const badgeContainer = document.getElementById('badge-container');
-
-            if (mode === 'f') {
+            if (isForte) {
                 document.getElementById('card-f').classList.add('active');
-                instr.innerText = "🐘 大象模式：大力彈！f";
-                playDing(200); // 低音
-                speak("大象來了，大力彈");
-                elephantBadges++;
+                playDing(true);
+                // 只在 Lv1 唸出來，Lv2/3 節奏太快不適合用語音
+                if (currentLevel === 1) speak("大象"); 
             } else {
                 document.getElementById('card-p').classList.add('active');
-                instr.innerText = "🐦 小鳥模式：輕輕彈！p";
-                playDing(800); // 高音
-                speak("小鳥來了，輕輕彈");
-                birdBadges++;
+                playDing(false);
+                if (currentLevel === 1) speak("小鳥");
             }
-
-            updateBadges();
-
-            // 獎勵檢查
-            if (switchCount % 5 === 0) {
-                showCelebration();
-            }
+            
+            round++;
         }
 
-        function updateBadges() {
-            const container = document.getElementById('badge-container');
-            container.innerHTML = `<span>🐘 x ${elephantBadges}</span> <span>🐦 x ${birdBadges}</span>`;
-        }
-
-        function showCelebration() {
-            const cb = document.getElementById('celebration');
-            cb.style.display = 'block';
-            setTimeout(() => { cb.style.display = 'none'; }, 2000);
-        }
-
-        function toggleAuto() {
-            const btn = document.getElementById('autoBtn');
-            if (autoInterval) {
-                clearInterval(autoInterval);
-                autoInterval = null;
-                btn.innerText = "🎲 開始冒險 (自動切換)";
-                btn.style.backgroundColor = "#FFD54F";
+        // 結束遊戲
+        function stopGame(completed = false) {
+            clearInterval(gameInterval);
+            if (synth.speaking) synth.cancel();
+            
+            if (completed) {
+                showScreen('screen-eval');
             } else {
-                btn.innerText = "🛑 停止冒險";
-                btn.style.backgroundColor = "#FF5252";
-                btn.style.color = "white";
-                autoInterval = setInterval(() => {
-                    const nextMode = Math.random() > 0.5 ? 'f' : 'p';
-                    setMode(nextMode);
-                }, 4000);
+                resetToLogin();
             }
         }
 
-        function resetGame() {
-            if (autoInterval) toggleAuto();
-            switchCount = 0;
-            elephantBadges = 0;
-            birdBadges = 0;
-            document.getElementById('reward-text').innerText = "";
-            document.getElementById('badge-container').innerHTML = "";
-            setMode('p');
+        // 提交自評與儲存紀錄
+        function submitEval(evalResult) {
+            // 產生系統評語
+            const feedbackBox = document.getElementById('system-feedback');
+            if (evalResult.includes('輕鬆掌握')) {
+                feedbackBox.innerHTML = `🌟 <strong>老師評語：</strong>太棒了 ${playerName}！你已經是力度控制的大師，大象和小鳥都聽你的指揮！可以挑戰更快的速度喔！`;
+            } else if (evalResult.includes('有點挑戰')) {
+                feedbackBox.innerHTML = `👍 <strong>老師評語：</strong>${playerName} 做得很棒！察覺到力度變換不容易，代表你聽得很仔細。繼續保持，多練習幾次就會越來越順手！`;
+            } else {
+                feedbackBox.innerHTML = `💪 <strong>老師評語：</strong>${playerName} 辛苦了！這速度確實很快，建議我們可以先退回「等級 1」慢慢練習肌肉的記憶，不用著急喔！`;
+            }
+
+            // 儲存到 LocalStorage
+            saveRecord(evalResult);
+            renderLeaderboard();
+            showScreen('screen-leaderboard');
+        }
+
+        // 處理排行榜資料
+        function saveRecord(evalResult) {
+            let lb = JSON.parse(localStorage.getItem('musicGameLB')) || [];
+            
+            const record = {
+                name: playerName,
+                level: `Lv ${currentLevel}`,
+                evaluation: evalResult,
+                date: new Date().toLocaleDateString('zh-TW', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+            };
+            
+            lb.unshift(record); // 加到最前面
+            if (lb.length > 5) lb.pop(); // 只保留前 5 名
+            
+            localStorage.setItem('musicGameLB', JSON.stringify(lb));
+        }
+
+        function renderLeaderboard() {
+            let lb = JSON.parse(localStorage.getItem('musicGameLB')) || [];
+            const tbody = document.getElementById('lb-body');
+            tbody.innerHTML = '';
+            
+            lb.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${row.name}</strong></td>
+                    <td>${row.level}</td>
+                    <td>${row.evaluation}</td>
+                    <td style="font-size: 0.8rem; color: #666;">${row.date}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 返回首頁
+        function resetToLogin() {
+            document.getElementById('playerName').value = '';
+            showScreen('screen-login');
         }
     </script>
 </body>
