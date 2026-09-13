@@ -46,7 +46,7 @@
             border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.2s;
             background-color: white; border: 3px solid var(--primary-color); color: #333;
         }
-        .level-btn:hover { background-color: var(--primary-color); color: white; }
+        .level-btn:hover { background-color: var(--primary-color); color: white; transform: scale(1.05); }
 
         /* 視覺教具區 (遊戲中) */
         .teaching-cards { display: flex; gap: 20px; width: 100%; justify-content: center; margin-bottom: 30px; }
@@ -94,13 +94,9 @@
         
         <h2>選擇挑戰難度：</h2>
         <div>
-            <button class="level-btn" onclick="startGame(1)">🌱 等級 1 (慢速: 4秒)</button>
-            <button class="level-btn" onclick="startGame(2)">🏃 等級 2 (中速: 2.5秒)</button>
-            <button class="level-btn" onclick="startGame(3)">🔥 等級 3 (飛速: 1.5秒)</button>
-        </div>
-        <div class="feedback-box" style="margin-top: 30px; font-size: 1rem;">
-            <strong>📘 老師/家長提示：</strong><br>
-            這次更新了<strong>「音量修正」</strong>。大象和小鳥發出的「音高」完全相同，純粹以「大聲」與「細聲」來區分，幫助孩子正確建立「力度」而非「音高」的聽覺認知。
+            <button class="level-btn" onclick="startGame(1)">🌱 等級 1 (慢速: 8秒)</button>
+            <button class="level-btn" onclick="startGame(2)">🏃 等級 2 (中速: 5秒)</button>
+            <button class="level-btn" onclick="startGame(3)">🔥 等級 3 (飛速: 2秒)</button>
         </div>
     </div>
 
@@ -163,14 +159,13 @@
         // 系統變數
         let playerName = "";
         let currentLevel = 1;
-        let speed = 4000;
+        let speed = 8000;
         let round = 1;
         const totalRounds = 10;
         let gameInterval = null;
         let audioCtx = null;
-        const synth = window.speechSynthesis;
 
-        // 初始化 AudioContext (必須在使用者點擊後)
+        // 初始化 AudioContext
         function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -180,32 +175,32 @@
             }
         }
 
-        // --- 核心修正：統一音高，只改音量 ---
-        function playDing(isForte) {
+        // --- 核心修正：延長聲音，並極大化大細聲對比 ---
+        function playSustainedSound(isForte) {
             initAudio();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             
+            // 使用三角波讓聲音更平穩、飽滿
+            osc.type = 'triangle';
             osc.frequency.value = 440; // 統一音高 (A4)
             
-            // f (大象) 音量 100%，p (小鳥) 音量 5%
-            const targetVolume = isForte ? 1.0 : 0.05; 
+            // 大象 (f) 音量 100% (極大聲)，小鳥 (p) 音量 2% (極細聲)
+            const targetVolume = isForte ? 1.0 : 0.02; 
             
-            gain.gain.setValueAtTime(targetVolume, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+            // 根據關卡速度決定發聲長度，最長延長至 3 秒
+            const duration = Math.min((speed / 1000) * 0.8, 3); 
             
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.8);
-        }
-
-        function speak(text) {
-            if (synth.speaking) synth.cancel();
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.lang = 'zh-TW';
-            utter.rate = 1.1;
-            synth.speak(utter);
+            // 設定音量包絡線 (ADSR)，讓長音更自然
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(targetVolume, audioCtx.currentTime + 0.1); // 快速淡入
+            gain.gain.setValueAtTime(targetVolume, audioCtx.currentTime + duration - 0.5); // 延長保持音量
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration); // 漸弱淡出
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + duration);
         }
 
         // 切換畫面
@@ -226,9 +221,10 @@
             currentLevel = level;
             round = 1;
             
-            if (level === 1) speed = 4000;
-            if (level === 2) speed = 2500;
-            if (level === 3) speed = 1500;
+            // 設定各難度的秒數
+            if (level === 1) speed = 8000; // 8秒
+            if (level === 2) speed = 5000; // 5秒
+            if (level === 3) speed = 2000; // 2秒
 
             showScreen('screen-game');
             initAudio();
@@ -254,13 +250,10 @@
             
             if (isForte) {
                 document.getElementById('card-f').classList.add('active');
-                playDing(true);
-                // 只在 Lv1 唸出來，Lv2/3 節奏太快不適合用語音
-                if (currentLevel === 1) speak("大象"); 
+                playSustainedSound(true);  // 大象長音
             } else {
                 document.getElementById('card-p').classList.add('active');
-                playDing(false);
-                if (currentLevel === 1) speak("小鳥");
+                playSustainedSound(false); // 小鳥長音
             }
             
             round++;
@@ -269,7 +262,6 @@
         // 結束遊戲
         function stopGame(completed = false) {
             clearInterval(gameInterval);
-            if (synth.speaking) synth.cancel();
             
             if (completed) {
                 showScreen('screen-eval');
@@ -280,7 +272,6 @@
 
         // 提交自評與儲存紀錄
         function submitEval(evalResult) {
-            // 產生系統評語
             const feedbackBox = document.getElementById('system-feedback');
             if (evalResult.includes('輕鬆掌握')) {
                 feedbackBox.innerHTML = `🌟 <strong>老師評語：</strong>太棒了 ${playerName}！你已經是力度控制的大師，大象和小鳥都聽你的指揮！可以挑戰更快的速度喔！`;
@@ -290,7 +281,6 @@
                 feedbackBox.innerHTML = `💪 <strong>老師評語：</strong>${playerName} 辛苦了！這速度確實很快，建議我們可以先退回「等級 1」慢慢練習肌肉的記憶，不用著急喔！`;
             }
 
-            // 儲存到 LocalStorage
             saveRecord(evalResult);
             renderLeaderboard();
             showScreen('screen-leaderboard');
