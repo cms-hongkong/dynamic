@@ -41,8 +41,18 @@
             border-radius: 15px; text-align: center; width: 80%; max-width: 300px; margin-bottom: 20px;
         }
 
+        /* 電腦版同行，手機版自動換行 */
+        .level-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; 
+            gap: 15px;
+            width: 100%;
+            max-width: 800px;
+        }
+
         .level-btn {
-            padding: 15px 30px; font-size: 1.2rem; margin: 10px; border: none;
+            padding: 15px 30px; font-size: 1.2rem; border: none;
             border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.2s;
             background-color: white; border: 3px solid var(--primary-color); color: #333;
         }
@@ -53,7 +63,7 @@
         .card {
             flex: 1; border-radius: 30px; padding: 20px; text-align: center;
             transition: all 0.2s ease; border: 8px solid transparent; opacity: 0.6;
-            cursor: pointer; /* 提示可以點擊 */
+            cursor: pointer;
             transform: scale(0.95);
         }
         .card:hover { opacity: 0.9; transform: scale(1); }
@@ -64,12 +74,12 @@
         /* 答對與答錯的特效 */
         .card.correct { 
             opacity: 1; transform: scale(1.05); 
-            box-shadow: 0 0 30px 10px #4CAF50; /* 綠色光芒 */
+            box-shadow: 0 0 30px 10px #4CAF50;
             border-color: #4CAF50;
         }
         .card.wrong { 
             opacity: 1; transform: scale(1.05); 
-            box-shadow: 0 0 30px 10px #F44336; /* 紅色光芒 */
+            box-shadow: 0 0 30px 10px #F44336;
             border-color: #F44336;
             animation: shake 0.3s;
         }
@@ -106,7 +116,7 @@
         <input type="text" id="playerName" placeholder="例如：小明" autocomplete="off">
         
         <h2>選擇挑戰難度：</h2>
-        <div>
+        <div class="level-container">
             <button class="level-btn" onclick="startGame(1)">🌱 等級 1 (慢速: 8秒)</button>
             <button class="level-btn" onclick="startGame(2)">🏃 等級 2 (中速: 5秒)</button>
             <button class="level-btn" onclick="startGame(3)">🔥 等級 3 (飛速: 2秒)</button>
@@ -119,7 +129,6 @@
         <div class="instruction">👂 仔細聽，然後點擊正確的動物！</div>
         
         <div class="teaching-cards">
-            <!-- 加入 onclick 讓孩子自己點擊選擇 -->
             <div id="card-f" class="card elephant-card" onclick="checkAnswer('f')">
                 <span class="emoji-large">🐘</span>
                 <h2>大象來了</h2>
@@ -134,7 +143,7 @@
             </div>
         </div>
         
-        <button class="level-btn" style="background:#ef5350; color:white; border-color:#b71c1c;" onclick="stopGame()">🛑 提早結束</button>
+        <button class="level-btn" style="background:#ef5350; color:white; border-color:#b71c1c; margin-top:20px;" onclick="stopGame()">🛑 提早結束</button>
     </div>
 
     <!-- 畫面 3：自評畫面 -->
@@ -164,7 +173,6 @@
                 </tr>
             </thead>
             <tbody id="lb-body">
-                <!-- 排行榜內容由 JS 動態生成 -->
             </tbody>
         </table>
         
@@ -172,7 +180,6 @@
     </div>
 
     <script>
-        // 系統變數
         let playerName = "";
         let currentLevel = 1;
         let speed = 8000;
@@ -180,13 +187,12 @@
         const totalRounds = 10;
         
         let score = 0;
-        let currentTarget = null; // 紀錄當前正確答案 ('f' 或 'p')
-        let hasAnswered = false;  // 紀錄本回合是否已作答
+        let currentTarget = null;
+        let hasAnswered = false;
         
         let gameInterval = null;
         let audioCtx = null;
 
-        // 初始化 AudioContext
         function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -196,7 +202,6 @@
             }
         }
 
-        // --- 核心修正：延長聲音，200% 音量 ---
         function playSustainedSound(isForte) {
             initAudio();
             const osc = audioCtx.createOscillator();
@@ -205,11 +210,9 @@
             gain.connect(audioCtx.destination);
             
             osc.type = 'triangle';
-            osc.frequency.value = 440; // 統一音高 (A4)
+            osc.frequency.value = 440;
             
-            // ⚠️ 大象 (f) 音量設為 2.0 (200% 超大聲) ，小鳥 (p) 設為 0.02 (2% 超細聲)
             const targetVolume = isForte ? 2.0 : 0.02; 
-            
             const duration = Math.min((speed / 1000) * 0.8, 3); 
             
             gain.gain.setValueAtTime(0, audioCtx.currentTime);
@@ -221,13 +224,11 @@
             osc.stop(audioCtx.currentTime + duration);
         }
 
-        // 切換畫面
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         }
 
-        // 開始遊戲
         function startGame(level) {
             const nameInput = document.getElementById('playerName').value.trim();
             if (!nameInput) {
@@ -240,10 +241,9 @@
             round = 1;
             score = 0;
             
-            // 設定各難度的秒數
-            if (level === 1) speed = 8000; // 8秒
-            if (level === 2) speed = 5000; // 5秒
-            if (level === 3) speed = 2000; // 2秒
+            if (level === 1) speed = 8000;
+            if (level === 2) speed = 5000;
+            if (level === 3) speed = 2000;
 
             showScreen('screen-game');
             initAudio();
@@ -252,55 +252,43 @@
             gameInterval = setInterval(nextRound, speed);
         }
 
-        // 進行下一回合 (出題)
         function nextRound() {
             if (round > totalRounds) {
                 stopGame(true);
                 return;
             }
 
-            // 更新 UI，重置卡片狀態 (移除發光或震動效果)
             document.getElementById('progress').innerText = `回合: ${round} / ${totalRounds} | 得分: ${score}`;
             document.getElementById('card-f').className = 'card elephant-card';
             document.getElementById('card-p').className = 'card bird-card';
             
-            // 開放作答
             hasAnswered = false;
             
-            // 隨機決定正確答案
             const isForte = Math.random() > 0.5;
             currentTarget = isForte ? 'f' : 'p';
             
-            // 只播放聲音，不再主動亮起卡片
             playSustainedSound(isForte);
             
             round++;
         }
 
-        // 玩家點擊卡片作答
         function checkAnswer(choice) {
-            // 如果這回合已經答過，或是遊戲還沒開始出題，就忽略點擊
             if (hasAnswered || currentTarget === null) return;
             
-            hasAnswered = true; // 鎖定作答
+            hasAnswered = true;
             const cardF = document.getElementById('card-f');
             const cardP = document.getElementById('card-p');
             const chosenCard = choice === 'f' ? cardF : cardP;
 
             if (choice === currentTarget) {
-                // 答對了！
                 score++;
-                chosenCard.classList.add('correct'); // 亮綠光
-                
-                // 即時更新分數顯示 (因為 round 已經在 nextRound 加 1，所以顯示 round-1)
+                chosenCard.classList.add('correct');
                 document.getElementById('progress').innerText = `回合: ${round - 1} / ${totalRounds} | 得分: ${score}`;
             } else {
-                // 答錯了！
-                chosenCard.classList.add('wrong'); // 亮紅光並震動
+                chosenCard.classList.add('wrong');
             }
         }
 
-        // 結束遊戲
         function stopGame(completed = false) {
             clearInterval(gameInterval);
             currentTarget = null;
@@ -313,11 +301,9 @@
             }
         }
 
-        // 提交自評與儲存紀錄
         function submitEval(evalResult) {
             const feedbackBox = document.getElementById('system-feedback');
             
-            // 根據「得分」與「自評」綜合給予評語
             if (score >= 8) {
                 feedbackBox.innerHTML = `🌟 <strong>老師評語：</strong>太厲害了 ${playerName}！你拿了 ${score} 分！大象和小鳥的聲音都逃不過你的耳朵，力度控制超級棒！`;
             } else if (score >= 5) {
@@ -331,7 +317,6 @@
             showScreen('screen-leaderboard');
         }
 
-        // 處理排行榜資料 (現在加入 Score 紀錄)
         function saveRecord(evalResult) {
             let lb = JSON.parse(localStorage.getItem('musicGameLB')) || [];
             
@@ -342,8 +327,8 @@
                 evaluation: evalResult
             };
             
-            lb.unshift(record); // 加到最前面
-            if (lb.length > 5) lb.pop(); // 只保留前 5 名
+            lb.unshift(record);
+            if (lb.length > 5) lb.pop();
             
             localStorage.setItem('musicGameLB', JSON.stringify(lb));
         }
@@ -365,7 +350,6 @@
             });
         }
 
-        // 返回首頁
         function resetToLogin() {
             document.getElementById('playerName').value = '';
             showScreen('screen-login');
